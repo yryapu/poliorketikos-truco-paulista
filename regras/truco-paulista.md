@@ -160,13 +160,21 @@ efeito prático é idêntico. A mão de ferro (11 a 11) é jogada sem decisão, 
 com outros jogos. Descartada: o enunciado pede truco paulista, e inventar regra onde a fonte
 silencia é pior que estender a regra existente pelo caminho mais curto.
 
-## D-04 · Quem responde ao truco em 2x2
+## D-04 · Quem responde ao truco, e quem decide a mão de onze
 
-Responde **o jogador desafiado** — aquele cuja vez é. Na mesa física qualquer um da dupla pode
-responder.
+**Responde ao truco o adversário imediatamente à esquerda de quem pediu** — isto é, o próximo
+a jogar. Em 1x1 é trivialmente o outro jogador. Em 2x2 os assentos alternam equipe, então
+`(pedinte + 1) % n` é sempre um adversário, e é quem jogaria em seguida se não houvesse pedido.
+Na mesa física, qualquer um da dupla desafiada pode responder.
 **Alternativa descartada:** aceitar a resposta do primeiro da dupla que falar. Descartada pelo
-mesmo motivo de D-02: é uma corrida entre dois clientes, e exige um desempate que não compra
-capacidade de jogo. Custo que aceito: perde-se o momento social de o parceiro responder.
+mesmo motivo de D-02: é uma corrida entre dois clientes, exige desempate arbitrário e não
+compra capacidade de jogo. Custo que aceito: perde-se o momento social de o parceiro responder.
+
+Pela mesma razão, **quem decide a mão de onze** é um assento determinado, não "a dupla":
+escolho o membro da equipe em 11 que puxa a mão (o primeiro dela na ordem de jogo a partir do
+puxador). Os dois veem as cartas (é o direito que R-10 concede); um só clica.
+**Alternativa descartada:** exigir que os dois concordem. Descartada porque cria um impasse sem
+saída quando um deles não responde — e v1 não tem relógio de turno.
 
 ## D-05 · Quem puxa depois de um empate
 
@@ -174,3 +182,21 @@ Quem puxou a rodada empatada puxa a seguinte. Nenhuma fonte diz.
 **Alternativa descartada:** o *mão* da mão puxar sempre. Descartada por ser incoerente com
 D-01 (vencedor puxa) — manter uma única regra "quem levou, ou quem puxou se não houve
 vencedor" é mais simples que duas.
+
+## D-06 · Pedir aumento em mão de onze é recusado, não punido
+
+F-02 diz "Pedir = derrota imediata". Implemento como **ação inválida** (`SemAumentoNaMaoEspecial`):
+o pedido é recusado e o jogador segue jogando.
+**Alternativa descartada:** aplicar a derrota imediata literal. Descartada porque num cliente web
+o botão de truco é um pixel ao lado do da carta, e punir com a partida inteira um erro de clique
+transforma regra de etiqueta de mesa em perda de 12 pontos. Numa mesa física a punição faz
+sentido porque falar é deliberado; num clique, não. O custo que aceito: divirjo de F-02 neste
+ponto, e declaro.
+
+## D-07 · A visibilidade da mão de onze fecha com a decisão
+
+R-10 dá à equipe em 11 o direito de "olhar as cartas do parceiro (...) e decidir". Decido que a
+visibilidade vale **somente durante a decisão** e fecha quando ela é tomada.
+**Alternativa descartada:** manter a mão do parceiro visível pela mão inteira. Descartada porque
+a fonte amarra o direito ao ato de decidir, e visibilidade permanente mudaria o jogo bem mais do
+que a regra pretende — jogar a mão inteira vendo seis cartas em vez de três é outro jogo.
