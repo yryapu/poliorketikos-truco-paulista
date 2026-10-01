@@ -20,7 +20,8 @@ o cwd, não para cá.
 
 | ID | Claim | p | Resultado | Evidência |
 |----|-------|---|-----------|-----------|
-| P-006 (= CLI `8725c84e`) | `docker compose up --build` sobe o truco com healthcheck saudável na primeira tentativa | 0.60 | a fechar | refutaria: container reinicia, healthcheck `unhealthy`, ou SQLite falha por `read_only` |
-| P-007 | ≥5 dos 7 testes de front passam na primeira execução | 0.45 | a fechar | `docker compose --profile teste run --rm e2e` |
+| P-006 (= CLI `8725c84e`) | `docker compose up --build` sobe o truco com healthcheck saudável na primeira tentativa | 0.60 | ✅ acertou | `docker inspect` → `healthy` em 9 s; `/api/saude` → `{"ok":true}`; container `read_only`, uid 10001, `touch /app/x` recusado. Brier do CLI: **0,16** |
+| P-007 | ≥5 dos 7 testes de front passam na primeira execução | 0.45 | ✅ acertou | 6 de 7 na primeira execução; o único vermelho era asserção minha (E-07), não o jogo |
+| P-010 | Rodar `verbum-pronto` antes do `resultado.json` não vai achar nada que meus 52 testes já não cubram | 0.70 | ❌ **ERREI, e feio** | Achou **dois** defeitos de correção no caminho não-feliz: embaralhamento sob 64 bits de semente, e aposta que sumia no reinício. Ver a correção do veredito em `decisoes/D-13` |
 | P-008 | O corpus do reino não tem nada sobre regras de truco | 0.95 | ✅ acertou, **mas por motivo errado** | `memoria_consultar` devolveu `acertos: []` — e `paginas_varridas: 0`, `camadas: []`. Zero por falta de camada montada, não por ausência de conteúdo. Ver D-13 |
 | P-009 | O corpus do reino tem algo útil sobre separação pesquisa/operacional | 0.55 | ✅ acertou | `reino_consultar` devolveu `decisions/dois-repositorios.md` e `patterns/derived-index-single-source.md` em 195 páginas varridas. Confirmou a tese que eu já havia escrito; não a mudou |

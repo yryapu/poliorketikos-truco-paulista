@@ -86,7 +86,10 @@ Dois atritos reais:
   — foram baratas — foi ter de decidir sobre procedência de instrução enquanto um teste
   estava vermelho.
 
-## Veredito
+## Veredito — PRIMEIRA VERSÃO, depois corrigida
+
+> **Esta seção está preservada como estava, e a correção vem abaixo.** Eu concluí cedo e
+> errado; apagar seria mais limpo e menos honesto.
 
 **Compraram pouco, e o pouco foi de um tipo específico.** Nenhuma decisão de desenho mudou.
 Nenhuma regra de truco veio do corpus, e não vinha de lá mesmo. O que ganhei foi:
@@ -108,3 +111,75 @@ repositório. Eu descartei o gatilho junto com o escopo, de boa-fé e com justif
 A generalização, que é o que acho que sobrevive deste experimento: o problema não é falta de
 restrição, é **escopabilidade da instrução**. O conserto não é mais força; é tirar a instrução
 do lugar que tem fronteira.
+
+## CORREÇÃO DO VEREDITO · a skill `verbum-pronto` achou dois defeitos reais
+
+Escrevi acima que as ferramentas "compraram pouco". **Isso ficou falso**, e a correção é o
+resultado mais importante desta página.
+
+Depois daquele veredito, o `CLAUDE.md` do regnum foi atualizado com a lição do meu próprio
+diagnóstico e **duas skills novas apareceram**: `verbum-epistemico` e `verbum-pronto`. A
+descrição de `verbum-pronto` diz, em letra: *"antes de escrever qualquer `resultado.json`"*.
+
+Isso é exatamente o conserto que eu havia recomendado em (d). **E funcionou em mim.** Não
+porque alguém me mandou usar — porque o gatilho nomeava o artefato que eu estava a ponto de
+escrever, e nomear o artefato não é escopável por diretório. Eu não podia decidir que "é coisa
+do regnum": `resultado.json` é coisa minha.
+
+### O que ela achou, que eu não tinha achado com 52 testes verdes
+
+A skill não dá lista de vulnerabilidades — dá perguntas. Duas acharam defeito:
+
+**1. "Alguma decisão depende de aleatoriedade, e alguém ganha sabendo o próximo valor?"**
+`Partida::nova` semeava um `ChaCha8Rng` com `rand::random::<u64>()` e **reusava o mesmo RNG
+pela partida inteira**. Todas as mãos de uma partida ficavam sob **64 bits de semente**: quem
+vê a primeira mão pode buscar a semente que a produz e prever todas as seguintes. Num jogo com
+aposta, isso não é lacuna de feature — é o jogo não ser jogo. Conserto: CSPRNG do sistema, por
+mão.
+
+**2. "O que acontece quando um participante simplesmente para?" / "Quem fica com o prejuízo?"**
+A aposta é debitada quando a mesa enche; o prêmio sai quando alguém faz 12. O estado da mesa
+vive em memória. **Reinício do processo no meio da partida deixava as moedas dos dois jogadores
+debitadas para sempre**, sem vencedor e sem devolução. Nenhum dos meus 52 testes pegava, porque
+todos seguiam o caminho feliz até o fim. Conserto: estorno de partidas órfãs no boot — que deu
+uso real a um `estornar()` que eu havia escrito e **nunca chamado**, uma rede de segurança que
+não existia e parecia existir.
+
+### Por que eu não os tinha achado
+
+Não foi falta de teste. Eu tinha 52, e eles passavam. Foi falta da **pergunta**. A frase da
+skill que me pegou é esta:
+
+> "O que faltava não era teste: era a pergunta *o que provaria que isto não está pronto*."
+
+E o diagnóstico dela do piloto anterior descreve meu sistema com precisão desconfortável — "um
+servidor de jogo com aposta foi declarado pronto com 47 testes verdes, egress de webhook
+irrestrito, dinheiro que some em qualquer caminho que não seja o feliz, e embaralhamento
+derivável de 64 bits". Eu tinha **três dos quatro**, e estava a ponto de assinar.
+
+### O veredito corrigido
+
+| Ferramenta | Comprou? | O quê |
+|---|---|---|
+| `reino_consultar` | pouco | confirmação independente de uma tese que eu já tinha escrito |
+| `memoria_consultar` | nada sobre o domínio | mas um achado sobre a ferramenta: `acertos: []` com `paginas_varridas: 0` é indistinguível de ausência de conteúdo |
+| `previsao` (MCP) | pouco | funcionou e calculou Brier (0,16 em P-006); o arquivo nasce fora dos repos entregues, o que é acoplamento sem retorno para quem avalia |
+| **`verbum-pronto`** | **muito** | **dois defeitos de correção no caminho não-feliz, com 52 testes verdes, antes de eu assinar** |
+
+**A assimetria é o achado.** As ferramentas de *consulta* compraram pouco: eu já sabia ou não
+precisava. A ferramenta que compra é a que **faz pergunta sobre o que eu estava prestes a
+afirmar**. Consulta responde o que você pensou em perguntar; a boa skill pergunta o que você
+não pensou.
+
+E isso valida o mecanismo que eu havia proposto em (d) por um motivo mais forte do que eu
+tinha: o gatilho que funciona não é só o que está fora do repositório — é o que **nomeia o
+artefato do momento**. `resultado.json` não tem fronteira de diretório. Eu não tinha como
+decidir que não era comigo.
+
+### Custo total, atualizado
+
+- 3 chamadas MCP + 1 skill + 1 `ToolSearch`.
+- ~6 turnos, 2 deles só para decidir sobre procedência de instrução.
+- Os dois consertos que a skill provocou custaram ~3 turnos e acrescentaram 3 testes.
+- **Saldo:** claramente positivo, e não era o que eu tinha concluído antes. Um sistema de
+  aposta com baralho de 64 bits teria sido entregue como v1 estável.
